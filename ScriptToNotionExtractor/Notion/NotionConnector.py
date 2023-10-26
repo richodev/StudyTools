@@ -1,4 +1,4 @@
-from HttpClient import HttpClient
+from Http.HttpClient import HttpClient
 
 from typing import List, Dict
 
@@ -49,13 +49,18 @@ class NotionConnector(object):
     
     def GetPage(self, pageId: str) -> Dict:
         url = f"https://api.notion.com/v1/pages/{pageId}"
-        content = self.__httpClient.RunGet(url, headers=self.__headers)
+        content = self.__httpClient.RunGet(url)
         return content
-        
-
-notionConnector = NotionConnector()
-siteId = notionConnector.SearchPageId("Theoretische Informatik: Algorithmen Datenstrukturen")
-print(f"Found Sites: {len(siteId)}. Showing Last Two Edited Sites:")
-print(json.dumps(siteId[:2], indent=4))
-siteId = notionConnector.GetPageIdByPropertyValue("047a0500-c37f-4d15-bf29-c19e1a11538e", "Kursnummer", "INFO4345")
-print(json.dumps(siteId, indent=4))
+    
+    def GetPageProperty(self, pageId: str, propertyName: str) -> Dict:
+        url = f"https://api.notion.com/v1/pages/{pageId}/properties/{propertyName}"
+        content = self.__httpClient.RunGet(url)
+        return content
+    
+    def GetPageBlocks(self, pageId: str) -> Dict:
+        return self.GetBlockChildren(pageId)
+    
+    def GetBlockChildren(self, blockId: str) -> Dict:
+        url = f"https://api.notion.com/v1/blocks/{blockId}/children"
+        content = self.__httpClient.RunGet(url, params={"page_size": 100})
+        return content
