@@ -9,7 +9,7 @@ class HttpClient:
         defaultHeaders.update(authHeader)
         self.__defaultHeaders = defaultHeaders.copy()
 
-    def RunGet(self, url: str, data: dict = None, params: dict = None, headers: dict = None) -> Any:
+    def RunGet(self, url: str, data: dict = None, params: dict = None, headers: dict = {}) -> Any:
         response = self.__ExecuteRequest("GET", url, json=data, params=params, headers=headers)
         if response.status_code != 200:
             raise Exception(f"[HttpClient][ERROR] GET request to url {url} returned with status code {response.status_code}.")
@@ -19,7 +19,7 @@ class HttpClient:
             return json.loads(response.content)
         return response
     
-    def RunPost(self, url: str, data: dict = None, params: dict = None, headers: dict = None) -> Any:
+    def RunPost(self, url: str, data: dict = None, params: dict = None, headers: dict = {}) -> Any:
         response = self.__ExecuteRequest("POST", url, json=data, params=params, headers=headers)
         if response.status_code != 200:
             raise Exception(f"[HttpClient][ERROR] POST request to url {url} returned with status code {response.status_code}.")
