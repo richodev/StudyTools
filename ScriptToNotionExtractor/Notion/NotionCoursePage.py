@@ -1,4 +1,5 @@
-from Notion.NotionConnector import NotionConnector
+from Notion.DatabaseEndpoint.DatabaseEndpoint import DatabaseEndpoint
+from Notion.BlocksEndpoint.BlocksEndpoint import BlocksEndpoint
 
 import logging
 
@@ -6,29 +7,41 @@ import logging
 NOTION_COURSE_DATABASE_ID = "047a0500-c37f-4d15-bf29-c19e1a11538e"
 
 class NotionCoursePage(object):
-    def __init__(self, notionConnector: NotionConnector, logger: logging.Logger):
-        self.__m_notionConnector = notionConnector
-        self.__m_logger = logger
+    def __init__(self, courseNumber: str):
+        self.__m_logger = logging.getLogger()
+
+        self.__m_courseNumber = courseNumber
+        self.__m_databaseEP = DatabaseEndpoint(NOTION_COURSE_DATABASE_ID)
+        self.__m_courseSiteId = self.DetermineCourseSiteId()
+        self.__m_lectureNotesDatabaseId = self.DetermineLectureNotesDatabaseId()
 
 
-    def PrepareLectureNotesPage(self, courseNumber: str, overwrite: bool = False, update: bool = False):
-        lectureNotesDatabaseId = self.DetermineLectureNotesDatabaseId(courseNumber)
+    def PrepareLectureNotesPage(self, overwrite: bool = False, update: bool = False):
+        lectureNotesDatabaseId = self.DetermineLectureNotesDatabaseId(self.__m_courseNumber)
         if not self.LectureNotePageExists(lectureNotesDatabaseId):
             self.CreateLectureNotePage(lectureNotesDatabaseId)
 
 
-    def DetermineLectureNotesDatabaseId(self, courseNumber: str) -> str:
-        siteId = self.__m_notionConnector.GetPageIdByPropertyValue(NOTION_COURSE_DATABASE_ID, "Kursnummer", courseNumber)
-        self.__m_logger.debug(f"Notion course site id found for course number \"{courseNumber}\": \"{siteId}\"")
-        pageBlocks = self.__m_notionConnector.GetPageBlocks(siteId)["results"]
+    def DetermineCourseSiteId(self) -> str:
+        try:
+            siteId = self.__m_databaseEP.GetPageIdByPropertyValue(NOTION_COURSE_DATABASE_ID, "Kursnummer", self.__m_courseNumber)
+        except Exception as e:
+            excMsg = f"Failed to determine Notion course site id for course number \"{self.__m_courseNumber}\"."
+            self.__m_logger.error(excMsg)
+            raise Exception(excMsg) from e
+        self.__m_logger.debug(f"Found Notion course site id for course number \"{self.__m_courseNumber}\": \"{siteId}\"")
+
+    def DetermineLectureNotesDatabaseId(self) -> str:
+        blocksEndpoint = BlocksEndpoint()
+        pageBlocks = blocksEndpoint.GetPageBlocks(self.__m_courseSiteId)["results"]
         for block in pageBlocks:
             if block["type"] != "column_list" or block["has_children"] == False:
                 continue
-            columns = self.__m_notionConnector.GetBlockChildren(block["id"])
+            columns = blocksEndpoint.GetBlockChildren(block["id"])
             for column in columns["results"]:
                 if column["type"] != "column" or column["has_children"] == False:
                     continue
-                columnChildren = self.__m_notionConnector.GetBlockChildren(column["id"])
+                columnChildren = blocksEndpoint.GetBlockChildren(column["id"])
                 for columnChild in columnChildren["results"]:
                     if columnChild["type"] != "child_database":
                         continue
@@ -38,6 +51,7 @@ class NotionCoursePage(object):
 
 
     def LectureNotePageExists(self, lectureNotesDatabaseId: str) -> bool:
+        databaseEndpoint = DatabaseEndpoint()
         return False
 
 

@@ -8,7 +8,7 @@ import sys
 
 
 #----- Logging -----
-g_logger = logging.getLogger("ScriptToNotionExtractor")
+g_logger = logging.getLogger()
 g_logger.setLevel(logging.DEBUG)
 
 stdFormatter = logging.Formatter("[%(module)s][%(levelname)s] %(message)s")
@@ -62,8 +62,8 @@ def main():
     g_logger.debug(f"Cmd Line Args: {args}")
 
     notionConnector = NotionConnector()
-    notionCoursePage = NotionCoursePage(notionConnector, g_logger)
-    notionCoursePage.PrepareLectureNotesPage(args.courseNumber, args.overwrite, args.update)
+    notionCoursePage = NotionCoursePage(args.courseNumber)
+    notionCoursePage.PrepareLectureNotesPage(args.overwrite, args.update)
 
     g_logger.info("Script executed.")
 
