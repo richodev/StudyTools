@@ -5,13 +5,14 @@ from typing import List, Dict
 import os
 
 class NotionConnector(object):
-    _instance = None
+    __m_instance = None
+    __m_httpClient = None
 
     def __new__(cls, secretToken: str = None):
-        if cls._instance is None:
-            cls._instance = super(NotionConnector, cls).__new__(cls)
-            cls.__InitHttpClient(secretToken)
-        return cls._instance
+        if cls.__m_instance is None:
+            cls.__m_instance = super(NotionConnector, cls).__new__(cls)
+            cls.__m_instance.__InitHttpClient(secretToken)
+        return cls.__m_instance
     
     def __InitHttpClient(cls, secretToken: str = None):
         if secretToken is None:

@@ -63,7 +63,7 @@ def main():
 
     notionConnector = NotionConnector()
     notionCoursePage = NotionCoursePage(args.courseNumber)
-    notionCoursePage.PrepareLectureNotesPage(args.overwrite, args.update)
+    notionCoursePage.PrepareLectureNotesPage("10. Speicherkonsistenz und Synchronisation", args.overwrite, args.update)
 
     g_logger.info("Script executed.")
 

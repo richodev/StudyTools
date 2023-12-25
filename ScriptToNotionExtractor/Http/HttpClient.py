@@ -29,6 +29,13 @@ class HttpClient:
             return json.loads(response.content)
         return response
 
+    
+    def RunPatch(self, url: str, data: dict = None, params: dict = None, headers: dict = {}) -> None:
+        response = self.__ExecuteRequest("PATCH", url, json=data, params=params, headers=headers)
+        if response.status_code != 200:
+            raise Exception(f"[HttpClient][ERROR] PATCH request to url {url} returned with status code {response.status_code}.")
+    
+
     def __ExecuteRequest(self, requestType: str, url: str, **kwargs) -> requests.Response:
         self.__defaultHeaders.update(kwargs.get("headers", {}))
         kwargs["headers"] = self.__defaultHeaders
