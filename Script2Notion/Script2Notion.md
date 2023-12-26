@@ -10,12 +10,17 @@ This tool can be used to publish a lecture script as a lecture notes page to my 
 
 **Python** 
 
-- `requests`: Version 2.31.0
-- `pdf2image`: Version 1.16.3
+|Library|Version|Installation|
+|--|--|--|
+|`requests`| 2.31.0 | `pip install requests==2.31.0`|
+|`pdf2image`| 1.16.3 | `pip install pdf2image==1.16.3`|
   
 **Windows**
 
-- `Poppler`: Version 23.11.0 (Library needed by `pdf2image`)
+|Library|Version|Installation|
+|--|--|--|
+| `Poppler` (Library needed by `pdf2image`) | 23.11.0 | [GitHub Poppler Windows](https://github.com/oschwartz10612/poppler-windows) |
+
 
 ### Notion API Token (Integration)
 
