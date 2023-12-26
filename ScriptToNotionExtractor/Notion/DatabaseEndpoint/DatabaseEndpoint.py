@@ -20,10 +20,6 @@ class DatabaseEndpoint(object):
                         "rich_text": {
                             "equals": propertyValue
                         }
-                    },
-                    {
-                        "property": "archived",
-                        "equals": False
                     }
                 ]
             }

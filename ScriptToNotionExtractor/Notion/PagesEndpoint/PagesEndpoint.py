@@ -32,6 +32,6 @@ class PagesEndpoint(object):
 
     def ArchivePage(self, pageId: str) -> None:
         headers = {"Content-Type": "application/json"}
-        self.__m_httpClient.RunPost(f"https://api.notion.com/v1/pages/{pageId}", headers=headers, data={
+        self.__m_httpClient.RunPatch(f"https://api.notion.com/v1/pages/{pageId}", headers=headers, data={
             "archived": True 
         })
