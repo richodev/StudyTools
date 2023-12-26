@@ -72,9 +72,8 @@ def main():
     g_logger.debug(f"Cmd Line Args: {args}")
 
     pdfParser = PdfParser(args.lectureScriptPath)
-    pdfParser.NextPage()
 
-    if args.skipPublish:
+    if not args.skipPublish:
         notionConnector = NotionConnector()
         notionCoursePage = NotionCoursePage(args.courseNumber)
         notionCoursePage.PrepareLectureNotesPage("10. Speicherkonsistenz und Synchronisation", args.overwrite, args.update)
