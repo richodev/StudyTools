@@ -1,14 +1,14 @@
 from Notion.NotionConnector import NotionConnector
 from Notion.NotionCoursePage import NotionCoursePage
+from PdfParser.PdfParser import PdfParser
 
 import argparse
 import logging
-import json
 import sys
 
 
 #----- Logging -----
-g_logger = logging.getLogger()
+g_logger = logging.getLogger("Script2Notion")
 g_logger.setLevel(logging.DEBUG)
 
 stdFormatter = logging.Formatter("[%(module)s][%(levelname)s] %(message)s")
@@ -30,7 +30,7 @@ g_cmdLineParser = argparse.ArgumentParser(
 
 g_cmdLineParser.add_argument(
     "lectureScriptPath",
-    help="The path to the lecture script.",
+    help="The path to the lecture script file (must be a PDF file).",
     type=str)
 
 g_cmdLineParser.add_argument(
@@ -40,18 +40,28 @@ g_cmdLineParser.add_argument(
     type=str)
 
 g_cmdLineParser.add_argument(
+    "-t", "--notionToken",
+    help="""Specifies the Notion secret token which should be used when accessing the Notion API.""",
+    type=str, required=False)
+
+g_cmdLineParser.add_argument(
     "-o", "--overwrite",
-    help="""Determines how the extracted slides will be published to Notion. If false a new Notion page 
-    will be created. If true and there is an existing Notion page with the same name the existing page will be 
-    overwritten.""",
+    help="""Determines how the lecture script will be published to Notion if a lecture notes page with the 
+     same title already exists. If true and there is an existing Notion page with the same name the existing page 
+     will be archived and a new site will be created. If false and update is false aswell the script will terminate.""",
     type=bool, default=False, required=False)
 
 g_cmdLineParser.add_argument(
     "-u", "--update",
-    help="""Determines how the extracted slides will be published to Notion. If false the extracted slides
-     will be published to a new Notion page. If true and there is an existing Notion page with the same name the
-     existing page will be updated.""",
+    help="""Determines how the lecture script will be published to Notion if a lecture notes page with the 
+     same title already exists. If true and there is an existing Notion page with the same name the existing page 
+     will be updated. If false and overwrite is false aswell the script will terminate.""",
      type=bool, default=False, required=False)
+
+g_cmdLineParser.add_argument(
+    "-s", "--skipPublish",
+    help="""If set to true the publishing of the lecture script will be skipped.""",
+     type=bool, default=True, required=False)
 
 
 #----- Main -----
@@ -61,9 +71,13 @@ def main():
     args = g_cmdLineParser.parse_args(sys.argv[1:])
     g_logger.debug(f"Cmd Line Args: {args}")
 
-    notionConnector = NotionConnector()
-    notionCoursePage = NotionCoursePage(args.courseNumber)
-    notionCoursePage.PrepareLectureNotesPage("10. Speicherkonsistenz und Synchronisation", args.overwrite, args.update)
+    pdfParser = PdfParser(args.lectureScriptPath)
+    pdfParser.NextPage()
+
+    if args.skipPublish:
+        notionConnector = NotionConnector()
+        notionCoursePage = NotionCoursePage(args.courseNumber)
+        notionCoursePage.PrepareLectureNotesPage("10. Speicherkonsistenz und Synchronisation", args.overwrite, args.update)
 
     g_logger.info("Script executed.")
 

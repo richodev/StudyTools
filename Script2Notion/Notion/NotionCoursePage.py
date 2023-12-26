@@ -11,7 +11,7 @@ NOTION_COURSE_DATABASE_ID = "047a0500-c37f-4d15-bf29-c19e1a11538e"
 
 class NotionCoursePage(object):
     def __init__(self, courseNumber: str):
-        self.__m_logger = logging.getLogger()
+        self.__m_logger = logging.getLogger("Script2Notion")
 
         self.__m_courseNumber = courseNumber
         self.__m_databaseEP = DatabaseEndpoint(NOTION_COURSE_DATABASE_ID)
@@ -31,6 +31,7 @@ class NotionCoursePage(object):
             self.__CreateLectureNotePage(title)
         else:
             self.__CreateLectureNotePage(title)
+
 
     def AppendLectureNotesPage(self, title: str, content: Any) -> None:
         lectureNotesPageId = self.__m_lectureNotesDatabaseEP.SearchPageIdByProperty("title", title)
