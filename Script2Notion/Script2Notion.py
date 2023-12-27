@@ -1,10 +1,10 @@
 from Notion.NotionConnector import NotionConnector
 from Notion.NotionCoursePage import NotionCoursePage
-from PdfParser.PdfParser import PdfParser
 
 import argparse
 import logging
 import sys
+import os
 
 
 #----- Logging -----
@@ -61,7 +61,7 @@ g_cmdLineParser.add_argument(
 g_cmdLineParser.add_argument(
     "-s", "--skipPublish",
     help="""If set to true the publishing of the lecture script will be skipped.""",
-     type=bool, default=True, required=False)
+     type=bool, default=False, required=False)
 
 
 #----- Main -----
@@ -70,16 +70,22 @@ def main():
     
     args = g_cmdLineParser.parse_args(sys.argv[1:])
     g_logger.debug(f"Cmd Line Args: {args}")
+    if not os.path.exists(args.lectureScriptPath) or not args.lectureScriptPath.endswith(".pdf"):
+        excMsg = f"The given lecture script path \"{args.lectureScriptPath}\"does not point to a valid lecture script."
+        g_logger.error(excMsg)
+        raise Exception(excMsg)
 
-    pdfParser = PdfParser(args.lectureScriptPath)
-
-    if not args.skipPublish:
+    try:
         notionConnector = NotionConnector()
-        notionCoursePage = NotionCoursePage(args.courseNumber)
-        notionCoursePage.PrepareLectureNotesPage("10. Speicherkonsistenz und Synchronisation", args.overwrite, args.update)
-
+        notionCoursePage = NotionCoursePage(notionConnector, args.courseNumber)
+        lectureTitle = os.path.basename(args.lectureScriptPath).split(".pdf")[0]
+        notionCoursePage.PrepareLectureNotesPage(lectureTitle, args.overwrite, args.update)
+        notionCoursePage.UpdateLectureNotesPage(lectureTitle, args.lectureScriptPath)
+    except Exception as e:
+        excMsg = "Script execution failed."
+        g_logger.error(excMsg)
+        raise Exception(excMsg) from e
     g_logger.info("Script executed.")
-
 
 if __name__ == "__main__":
     main()

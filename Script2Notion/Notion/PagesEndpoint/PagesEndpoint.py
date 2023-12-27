@@ -3,8 +3,8 @@ from Notion.NotionConnector import NotionConnector
 from typing import Dict
 
 class PagesEndpoint(object):
-    def __init__(self):
-        self.__m_httpClient = NotionConnector().HttpClient
+    def __init__(self, notionConnector: NotionConnector):
+        self.__m_httpClient = notionConnector.HttpClient
 
     def CreatePageAtDatabase(self, databaseId: str, pageTitle: str) -> str:
         headers = {"Content-Type": "application/json"}

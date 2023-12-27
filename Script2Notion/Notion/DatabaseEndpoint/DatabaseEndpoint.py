@@ -4,14 +4,15 @@ from Notion.PagesEndpoint.PagesEndpoint import PagesEndpoint
 class MultiplePagesError(Exception): ...
 
 class DatabaseEndpoint(object):
-    def __init__(self, databaseId: str):
+    def __init__(self, notionConnector: NotionConnector, databaseId: str):
+        self.__m_notionConnector = notionConnector
         self.__m_databaseId = databaseId
-        self.__m_httpClient = NotionConnector().HttpClient
+        self.__m_httpClient = notionConnector.HttpClient
 
 
     def QueryPageObjectsByProperty(self, propertyName: str, propertyValue: str) -> dict:
         url = f"https://api.notion.com/v1/databases/{self.__m_databaseId}/query"
-        headers = {"Content-Type": "application/json"}
+        headers = { "Content-Type": "application/json" }
         data = { 
             "filter": {
                 "and": [
@@ -50,5 +51,5 @@ class DatabaseEndpoint(object):
         
 
     def CreatePage(self, pageTitle: str) -> str:
-        pagesEP = PagesEndpoint()
+        pagesEP = PagesEndpoint(self.__m_notionConnector)
         return pagesEP.CreatePageAtDatabase(self.__m_databaseId, pageTitle)
