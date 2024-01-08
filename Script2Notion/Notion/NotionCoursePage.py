@@ -59,15 +59,18 @@ class NotionCoursePage(object):
         exportedSlidesPaths = pdfParser.ParsePagesAsImages(exportPath)
         self.__PublishSlidesToGitHub(exportPath, courseName + " - " + lectureName)
         exportedSlidesGitPaths = []
-        for path in exportedSlidesPaths:
-            exportedSlidesGitPaths.append("/".join([NOTION_COURSE_LECTURE_SLIDES_EXPORT_BASE_PATH, courseName, lectureName, os.path.split(path)[1]]))
+        for slidePath in exportedSlidesPaths:
+            rest, slideFileName = os.path.split(slidePath)
+            rest, lectureDir = os.path.split(rest)
+            courseDir = os.path.split(rest)[1]
+            exportedSlidesGitPaths.append("/".join([NOTION_COURSE_LECTURE_SLIDES_EXPORT_BASE_PATH, courseDir, lectureDir, slideFileName]))
         return exportedSlidesGitPaths
 
     def __CreateLectureSlidesExportPath(self, courseName: str, lectureName: str) -> str:
-        exportPath = os.path.abspath(os.path.join(NOTION_COURSE_LECTURE_SLIDES_EXPORT_BASE_PATH, courseName))
+        exportPath = os.path.abspath(os.path.join(NOTION_COURSE_LECTURE_SLIDES_EXPORT_BASE_PATH, "".join(x for x in courseName if x.isalnum() or x == " ")))
         if not os.path.exists(exportPath):
             os.mkdir(exportPath)
-        exportPath = os.path.abspath(os.path.join(exportPath, lectureName))
+        exportPath = os.path.abspath(os.path.join(exportPath, "".join(x for x in lectureName if x.isalnum())))
         if not os.path.exists(exportPath):
             os.mkdir(exportPath)
         return exportPath
